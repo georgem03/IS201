@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FC Barcelona Trivia Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #002147;
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #A50044;
+    }
+
+    .game-box {
+      background: #133e7c;
+      border-radius: 10px;
+      padding: 30px;
+      max-width: 500px;
+      margin: 0 auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+
+    button {
+      background-color: #A50044;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #e6005c;
+    }
+
+    .score {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>FC Barcelona Trivia</h1>
+  <div class="game-box">
+    <p id="question">Click Start to begin!</p>
+    <div id="choices"></div>
+    <button id="startBtn">Start Game</button>
+    <p class="score" id="scoreText">Score: 0</p>
+    <p id="resultText"></p>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        question: "Who is FC Barcelona's all-time top scorer?",
+        choices: ["Ronaldinho", "Lionel Messi", "Luis Suárez", "Xavi"],
+        answer: "Lionel Messi"
+      },
+      {
+        question: "What is the nickname of FC Barcelona?",
+        choices: ["The Eagles", "The Blues", "The Red Devils", "Barça"],
+        answer: "Barça"
+      },
+      {
+        question: "Which stadium does FC Barcelona play in?",
+        choices: ["Santiago Bernabéu", "Old Trafford", "Camp Nou", "Allianz Arena"],
+        answer: "Camp Nou"
+      },
+      {
+        question: "Which rival team do Barça face in El Clásico?",
+        choices: ["Atlético Madrid", "Valencia", "Real Madrid", "Sevilla"],
+        answer: "Real Madrid"
+      },
+      {
+        question: "Which year was FC Barcelona founded?",
+        choices: ["1899", "1905", "1923", "1888"],
+        answer: "1899"
+      },
+      {
+        question: "Which country is FC Barcelona based in?",
+        choices: ["Portugal", "Italy", "Spain", "France"],
+        answer: "Spain"
+      },
+      {
+        question: "What are the team colors of FC Barcelona?",
+        choices: ["Red & White", "Blue & Red", "Black & Yellow", "Green & Gold"],
+        answer: "Blue & Red"
+      },
+      {
+        question: "Who was the legendary manager from the 'Dream Team' era in the 90s?",
+        choices: ["Pep Guardiola", "Luis Enrique", "Johan Cruyff", "Frank Rijkaard"],
+        answer: "Johan Cruyff"
+      },
+      {
+        question: "Which player wore the number 10 jersey after Messi left?",
+        choices: ["Pedri", "Ansu Fati", "Lewandowski", "Ferran Torres"],
+        answer: "Ansu Fati"
+      },
+      {
+        question: "How many Champions League titles has FC Barcelona won (as of 2024)?",
+        choices: ["3", "5", "7", "4"],
+        answer: "5"
+      },
+      {
+        question: "Which Barcelona player won the Ballon d'Or in 2021?",
+        choices: ["Messi", "Neymar", "Mbappé", "Iniesta"],
+        answer: "Messi"
+      },
+      {
+        question: "What's the name of Barça’s famous youth academy?",
+        choices: ["La Fábrica", "La Masia", "The Nest", "Academia Azulgrana"],
+        answer: "La Masia"
+      }
+    ];
+
+    let availableQuestions = [];
+    let score = 0;
+    let currentQuestion = {};
+    const winningScore = 3;
+
+    const questionText = document.getElementById("question");
+    const choicesDiv = document.getElementById("choices");
+    const startBtn = document.getElementById("startBtn");
+    const scoreText = document.getElementById("scoreText");
+    const resultText = document.getElementById("resultText");
+
+    function shuffleArray(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function startGame() {
+      score = 0;
+      availableQuestions = [...allQuestions];
+      scoreText.textContent = "Score: 0";
+      resultText.textContent = "";
+      startBtn.classList.add("hidden");
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (availableQuestions.length === 0) {
+        endGame(false);
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+      currentQuestion = availableQuestions.splice(randomIndex, 1)[0];
+
+      questionText.textContent = currentQuestion.question;
+      choicesDiv.innerHTML = "";
+
+      const shuffledChoices = shuffleArray(currentQuestion.choices);
+
+      shuffledChoices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.textContent = choice;
+        btn.onclick = () => handleAnswer(choice);
+        choicesDiv.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selected) {
+      if (selected === currentQuestion.answer) {
+        score++;
+        resultText.textContent = "✅ Correct!";
+      } else {
+        resultText.textContent = `❌ Wrong! It was: ${currentQuestion.answer}`;
+      }
+
+      scoreText.textContent = `Score: ${score}`;
+
+      if (score >= winningScore) {
+        endGame(true);
+      } else {
+        setTimeout(() => {
+          resultText.textContent = "";
+          showQuestion();
+        }, 1200);
+      }
+    }
+
+    function endGame(won) {
+      if (won) {
+        questionText.textContent = "🎉 You win! Visca el Barça!";
+      } else {
+        questionText.textContent = "😢 You ran out of questions. You lose!";
+      }
+      choicesDiv.innerHTML = "";
+      startBtn.textContent = "Play Again";
+      startBtn.classList.remove("hidden");
+    }
+
+    startBtn.addEventListener("click", startGame);
+  </script>
+</body>
+</html>
